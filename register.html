@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Buyzy</title>
+    <style>
+        body {
+            font-family: "Spartan", sans-serif;
+            background-color: #f9f9f9;
+            padding: 50px;
+        }
+        .register-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px #d9d2d21a;
+        }
+        .register-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .register-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .register-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #000000;
+            color: rgba(255, 255, 255, 0);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .register-container button:hover {
+            background-color: burlywood;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Register for Buyzy</h2>
+        <input type="email" id="new-username" placeholder="Email" required>
+        <input type="password" id="new-password" placeholder="Password" required>
+        <button id="register-button">Register</button>
+        <p id="register-message" style="color:red;"></p>
+    </div>
+
+    <!-- Firebase SDK -->
+<script type="module">
+    // Import the Firebase modules
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.19.0/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.19.0/firebase-auth.js';
+    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.19.0/firebase-firestore.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCT9Es6cS1cmBKLc4VAcq8KmrOJKmSbAt8",
+        authDomain: "buyzy-f207f.firebaseapp.com",
+        projectId: "buyzy-f207f",
+        storageBucket: "buyzy-f207f.appspot.com",
+        messagingSenderId: "562796706461",
+        appId: "1:562796706461:web:3e401761d089bb4655f274"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app); // Initialize Firestore
+
+    // Registration function
+    document.getElementById('register-button').addEventListener('click', async function() {
+        const email = document.getElementById('new-username').value;
+        const password = document.getElementById('new-password').value;
+
+        console.log("Register button clicked");
+        console.log("Email:", email, "Password:", password); // Log input values
+
+        // Check if email and password are not empty
+        if (!email || !password) {
+            document.getElementById('register-message').innerText = "Email and Password are required.";
+            return;
+        }
+
+        try {
+            // Register the user with Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log("User registered:", user);
+
+            // Store additional user information in Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+                email: user.email,
+                createdAt: new Date(),
+            });
+
+            alert('Registration successful! You can now log in.');
+            window.location.href = 'login.html'; // Redirect to login page
+        } catch (error) {
+            const errorMessage = error.message;
+            console.error("Error during registration:", errorMessage); // Log the error
+            document.getElementById('register-message').innerText = errorMessage; // Show error message
+        }
+    });
+</script>
+
+    
+</body>
+</html>

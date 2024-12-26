@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyzy Products Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Spartan", sans-serif;
+        }
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 80px;
+            background: #E3E6F3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+        .products-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .product-details {
+            flex: 1;
+            margin: 10px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-details img {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .star i {
+            color: gold;
+        }
+        .cart {
+            margin-top: 10px;
+            display: inline-block;
+            background-color: #088178;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .cart:hover {
+            background-color: #065c56;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCT9Es6cS1cmBKLc4VAcq8KmrOJKmSbAt8",
+            authDomain: "buyzy-f207f.firebaseapp.com",
+            projectId: "buyzy-f207f",
+            storageBucket: "buyzy-f207f.appspot.com",
+            messagingSenderId: "562796706461",
+            appId: "1:562796706461:web:3e401761d089bb4655f274"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to fetch all products from Firestore
+        async function fetchAllProducts() {
+            const productsContainer = document.querySelector('.products-container');
+            productsContainer.innerHTML = ''; // Clear previous content
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'products'));
+
+                if (querySnapshot.empty) {
+                    productsContainer.innerHTML = '<p>No products available.</p>';
+                    return;
+                }
+
+                // Loop through each product and display it on the page
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    productsContainer.innerHTML += `
+                        <div class="product-details">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h2>${product.name}</h2>
+                            <p>${product.price} Rs</p>
+                            <div class="star">
+                                ${'★'.repeat(product.rating)}${'☆'.repeat(5 - product.rating)}
+                            </div>
+                            <p>${product.category}</p>
+                            <a href="#" class="cart">Add to Cart</a>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                productsContainer.innerHTML = '<p>Error loading products.</p>';
+            }
+        }
+
+        // Fetch all products when the page loads
+        window.onload = fetchAllProducts;
+    </script>
+</head>
+<body>
+
+    <div id="header">
+        <span>BUYZY</span>
+        <ul id="navbar">
+            <li><a href="index.html">Home</a></li>
+            <li><a class="tree" href="products.html">Product</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="checkout.html">Checkout</a></li>
+            <li><a href="cart.html"><i class="fas fa-shopping-bag"></i></a></li>
+        </ul>
+    </div>
+
+    <div class="products-container">
+        <!-- Products will be dynamically added here -->
+    </div>
+
+</body>
+</html>

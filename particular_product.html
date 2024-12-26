@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyzy Product Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Spartan", sans-serif;
+        }
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 80px;
+            background: #E3E6F3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+        .product-details {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-details img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+        }
+        .star i {
+            color: gold;
+        }
+        .cart {
+            margin-top: 10px;
+            display: inline-block;
+            background-color: #088178;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .cart:hover {
+            background-color: #065c56;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCT9Es6cS1cmBKLc4VAcq8KmrOJKmSbAt8",
+            authDomain: "buyzy-f207f.firebaseapp.com",
+            projectId: "buyzy-f207f",
+            storageBucket: "buyzy-f207f.appspot.com",
+            messagingSenderId: "562796706461",
+            appId: "1:562796706461:web:3e401761d089bb4655f274"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function fetchProductById(productId) {
+            try {
+                const docRef = doc(db, 'products', productId);
+                const productDoc = await getDoc(docRef);
+
+                if (productDoc.exists()) {
+                    const product = productDoc.data();
+                    document.getElementById('product-name').innerText = product.name;
+                    document.getElementById('product-price').innerText = `${product.price} Rs`;
+                    document.getElementById('product-description').innerText = product.category;
+                    document.getElementById('product-img').src = product.image;
+
+                    const starsContainer = document.getElementById('product-stars');
+                    starsContainer.innerHTML = '';
+                    for (let i = 0; i < product.rating; i++) {
+                        starsContainer.innerHTML += '<i class="fas fa-star"></i>';
+                    }
+
+                    const addToCartButton = document.querySelector('.cart');
+                    addToCartButton.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        alert(`Added ${product.name} to the cart!`);
+                    });
+
+                } else {
+                    console.log("No such product!");
+                }
+
+            } catch (error) {
+                console.error("Error fetching product:", error);
+            }
+        }
+
+        window.onload = () => {
+            if (productId) {
+                fetchProductById(productId);
+            } else {
+                console.error("Product ID is missing from URL");
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="header">
+        <span>BUYZY</span>
+        <ul id="navbar">
+            <li><a href="index.html">Home</a></li>
+            <li><a class="tree" href="product.html">Product</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="checkout.html">Checkout</a></li>
+            <li><a href="cart.html"><i class="fas fa-shopping-bag"></i></a></li>
+        </ul>
+    </div>
+
+    <div class="product-details">
+        <img id="product-img" src="" alt="Product Image">
+        <h2 id="product-name">Loading...</h2>
+        <p id="product-price"></p>
+        <div id="product-stars" class="star"></div>
+        <p id="product-description"></p>
+        <a href="#" class="cart">Add to Cart</a>
+    </div>
+
+</body>
+</html>

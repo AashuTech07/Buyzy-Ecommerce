@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyzy Checkout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Spartan", sans-serif;
+        }
+
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 80px;
+            background: #E3E6F3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+
+        #navbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #navbar > li {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        #navbar > li > a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            transition: 0.3s ease;
+        }
+
+        #navbar > li > a:hover {
+            color: #088178;
+        }
+
+        .checkout-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .cart-item h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .cart-item p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .cart-item-price {
+            font-size: 16px;
+        }
+
+        .shipping-info {
+            margin-top: 20px;
+        }
+
+        .shipping-info label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .shipping-info input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .confirm-order {
+            background-color: #088178;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .confirm-order:hover {
+            background-color: #065c56;
+        }
+    </style>
+</head>
+<body>
+
+   
+    <section id="header">
+        <span>BUYZY</span>
+        <div>
+            <ul id="navbar">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="product.html">Product</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="cart.html"><i class="fas fa-shopping-bag"></i></a></li>
+                <li><a class="active" href="checkout.html">Checkout</a></li>
+            </ul>
+        </div>
+    </section>
+
+   
+    <div class="checkout-container">
+        <h2>Checkout</h2>
+        <div id="cart-items"></div>
+
+        <div class="shipping-info">
+            <h3>Shipping Information</h3>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+            
+            <label for="address">Address:</label>
+            <input type="text" id="address" placeholder="Enter your address" required>
+            
+            <label for="city">City:</label>
+            <input type="text" id="city" placeholder="Enter your city" required>
+            
+            <label for="zip">Zip Code:</label>
+            <input type="text" id="zip" placeholder="Enter your zip code" required>
+        </div>
+
+        <a href="#" class="confirm-order" id="confirm-order">Confirm Order</a>
+    </div>
+
+  
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+
+    <script>
+       
+        function getCartItems() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            return cart;
+        }
+
+       
+        function displayCartItems() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartItems = getCartItems();
+
+            if (cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<p>Your cart is empty</p>';
+                return;
+            }
+
+            cartItems.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+
+                cartItem.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+                    </div>
+                    <div class="cart-item-price">${item.price}</div>
+                `;
+
+                cartItemsContainer.appendChild(cartItem);
+            });
+        }
+
+      
+        function confirmOrder() {
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const zip = document.getElementById('zip').value;
+
+            if (!name || !address || !city || !zip) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+          
+        const shippingInfo = {
+            name: name,
+            address: address,
+            city: city,
+            zip: zip
+        };
+
+        localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
+
+           
+            alert(`Order confirmed for ${name}!\nAddress: ${address}, ${city}, ${zip}`);
+            
+            
+            localStorage.removeItem('cart');
+            window.location.href = 'index.html'; 
+        }
+
+       
+        displayCartItems();
+
+        
+        document.getElementById('confirm-order').addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default action of the anchor tag
+            confirmOrder();
+        });
+    </script>
+
+</body>
+</html>
